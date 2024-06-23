@@ -70,7 +70,7 @@ export default function Home() {
             </div>
             {item.type !== 'directory' && item.name !== '.' && item.name !== '..' && (
               <a
-                href={`${process.env.NEXT_PUBLIC_S3_PUBLIC_URL}/${item.path}`}
+                href={`https://public.jimchen.me/${item.path}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded"
