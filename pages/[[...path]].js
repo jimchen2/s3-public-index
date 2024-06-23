@@ -20,6 +20,7 @@ export default function Home() {
     setLoading(true);
     try {
       const response = await fetch(`/api/list-objects?prefix=${encodeURIComponent(prefix)}`);
+      console.log(response)
       if (!response.ok) {
         throw new Error('Failed to fetch items');
       }
@@ -43,7 +44,7 @@ export default function Home() {
   const allItems = [
     { name: '.', path: currentPath, type: 'directory' },
     ...(currentPath ? [{ name: '..', path: getParentPath(currentPath), type: 'directory' }] : []),
-    ...items.filter(item => item.name != currentPath )
+    ...items.filter(item => item.name !== currentPath )
   ];
 
   return (

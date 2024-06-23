@@ -10,11 +10,16 @@ export default async function handler(req, res) {
   });
 
   const bucketName = process.env.S3_BUCKET_NAME;
-  const prefix = req.query.prefix || '';
+  let prefix = req.query.prefix || '';
   const delimiter = '/';
 
   if (!bucketName) {
     return res.status(500).json({ error: "S3_BUCKET_NAME is not set in environment variables" });
+  }
+
+  // Ensure the prefix ends with a '/' if it's not empty
+  if (prefix && !prefix.endsWith('/')) {
+    prefix += '/';
   }
 
   try {
@@ -26,19 +31,21 @@ export default async function handler(req, res) {
 
     const response = await s3Client.send(command);
     
-    const directories = (response.CommonPrefixes || []).map(prefix => ({
-      name: prefix.Prefix.slice(prefix.Prefix.slice(0, -1).lastIndexOf('/') + 1, -1),
-      path: prefix.Prefix,
+    const directories = (response.CommonPrefixes || []).map(commonPrefix => ({
+      name: commonPrefix.Prefix.slice(prefix.length).replace('/', ''),
+      path: commonPrefix.Prefix,
       type: 'directory'
     }));
 
-    const files = (response.Contents || []).filter(item => item.Key !== prefix).map(item => ({
-      name: item.Key.slice(item.Key.lastIndexOf('/') + 1),
-      path: item.Key,
-      size: item.Size,
-      lastModified: item.LastModified,
-      type: 'file'
-    }));
+    const files = (response.Contents || [])
+      .filter(item => item.Key !== prefix)
+      .map(item => ({
+        name: item.Key.slice(prefix.length),
+        path: item.Key,
+        size: item.Size,
+        lastModified: item.LastModified,
+        type: 'file'
+      }));
 
     const items = [...directories, ...files];
 
