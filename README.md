@@ -1,9 +1,9 @@
 
 ## Install 
 ```sh
-mkdir nextjs-tube && cd nextjs-tube
+mkdir s3-public-index && cd s3-public-index
 # configure .env
-docker-compose up -d
+docker run -d --env-file .env -p 1241:3000 jimchen2/s3-public-index:latest
 ```
 
 ## Build
